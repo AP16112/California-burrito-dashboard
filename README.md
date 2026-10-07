@@ -22,7 +22,7 @@ The generated JSON dictionary-encodes repeated values such as dates, outlets, gr
 - `itemCube`: aggregated item metrics for the top-items table.
 - `dimensions`: filter values discovered from the dataset.
 
-The frontend is dependency-light: static HTML/CSS/JavaScript with Chart.js loaded from CDN. This makes deployment straightforward on Vercel, Netlify, Render Static Sites, Azure Static Web Apps, or GitHub Pages.
+The frontend is dependency-light: static HTML/CSS/JavaScript with Chart.js loaded from CDN. This makes deployment straightforward on Vercel as a static site.
 
 ## Dashboard Features
 
@@ -56,14 +56,20 @@ The frontend is dependency-light: static HTML/CSS/JavaScript with Chart.js loade
 - Generated insight cards that summarize the current dashboard view.
 - Responsive desktop and mobile layout.
 - Performance optimizations through precomputed aggregates, dictionary-encoded JSON, and static-host cache headers for the analytics payload.
-- Deployment configuration files for Vercel and Netlify cache behavior.
+- Deployment configuration for Vercel cache behavior.
 
 ## Deployment
 
 1. Run `npm.cmd run build:data`.
 2. Push the project to a public GitHub repository.
-3. Deploy the repository to Vercel, Netlify, Render, Railway, or Azure Static Web Apps.
-4. Use `npm run build:data` as the build command if the platform supports Python. Otherwise, commit `public/data/analytics.json` after generating it locally and deploy as a static site.
+3. Import the repository in Vercel.
+4. Use these Vercel settings:
+   - Framework Preset: `Other`
+   - Build Command: leave empty
+   - Output Directory: `.`
+   - Install Command: leave default or empty
+
+Do not run `npm run build:data` on Vercel unless you also upload `data.xlsx`. The raw workbook is ignored from Git, and the committed `public/data/analytics.json` is what the deployed static dashboard reads.
 
 Deployed URL: _add after deployment_
 GitHub repository: _add after publishing_
