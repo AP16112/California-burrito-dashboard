@@ -15,7 +15,6 @@ const L = { date: 0, outlet: 1, brand: 2, group: 3, orderType: 4, settlement: 5,
 const I = { date: 0, outlet: 1, brand: 2, group: 3, item: 4, orderType: 5, revenue: 6, quantity: 7, records: 8 };
 
 const elements = {
-  loadStatus: document.getElementById("loadStatus"),
   dateFrom: document.getElementById("dateFrom"),
   dateTo: document.getElementById("dateTo"),
   outlet: document.getElementById("outletFilter"),
@@ -41,10 +40,9 @@ async function boot() {
     indexDimensions();
     setupFilters();
     render();
-    elements.loadStatus.textContent = `${integer.format(state.metadata.totalRecords)} rows processed`;
   } catch (error) {
-    elements.loadStatus.textContent = error.message;
     console.error(error);
+    alert(error.message);
   }
 }
 
