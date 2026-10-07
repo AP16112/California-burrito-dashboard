@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node scripts/build_static.js",
     "build:data": "python scripts/build_data.py",
-    "dev": "node server.js"
+    "dev": "python -m http.server 4173"
   },
   "keywords": [
     "analytics",

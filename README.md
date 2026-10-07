@@ -22,7 +22,7 @@ The generated JSON dictionary-encodes repeated values such as dates, outlets, gr
 - `itemCube`: aggregated item metrics for the top-items table.
 - `dimensions`: filter values discovered from the dataset.
 
-The frontend is dependency-light: static HTML/CSS/JavaScript with Chart.js loaded from CDN. This makes deployment straightforward on Vercel as a static site.
+The frontend is dependency-light: static HTML/CSS/JavaScript with Chart.js loaded from CDN. There is no production server; Vercel serves the generated `dist` folder as a static site.
 
 ## Dashboard Features
 
