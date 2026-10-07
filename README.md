@@ -72,4 +72,5 @@ The frontend is dependency-light: static HTML/CSS/JavaScript with Chart.js loade
 Do not run `npm run build:data` on Vercel unless you also upload `data.xlsx`. The raw workbook is ignored from Git, and the committed `public/data/analytics.json` is what the deployed static dashboard reads. `npm run build` only copies the static dashboard into `dist` for Vercel.
 
 Deployed URL: https://california-burrito-dashboard.vercel.app/
+
 GitHub repository: https://github.com/AP16112/California-burrito-dashboard
