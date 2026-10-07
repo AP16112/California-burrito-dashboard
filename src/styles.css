@@ -56,7 +56,7 @@ main {
   box-shadow: var(--shadow);
   display: grid;
   gap: 14px;
-  grid-template-columns: repeat(6, minmax(140px, 1fr));
+  grid-template-columns: repeat(7, minmax(130px, 1fr));
   padding: 16px;
 }
 
@@ -70,7 +70,8 @@ label {
 }
 
 input,
-select {
+select,
+button {
   background: #fff;
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -79,6 +80,22 @@ select {
   min-height: 40px;
   padding: 8px 10px;
   width: 100%;
+}
+
+button {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #fff;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+button:hover {
+  background: #115e59;
+}
+
+.filter-actions {
+  align-self: end;
 }
 
 .kpis {
@@ -124,6 +141,10 @@ select {
   padding: 18px;
 }
 
+.insight-panel {
+  min-height: 0;
+}
+
 .panel.wide {
   grid-column: 1 / -1;
 }
@@ -143,6 +164,40 @@ select {
 canvas {
   max-height: 300px;
   width: 100%;
+}
+
+.insights {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.insights article {
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.insights span {
+  color: var(--muted);
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.insights strong {
+  display: block;
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.insights p {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 6px;
 }
 
 .table-wrap {
@@ -188,7 +243,8 @@ td:nth-child(4) {
 
   .filters,
   .kpis,
-  .grid {
+  .grid,
+  .insights {
     grid-template-columns: 1fr;
   }
 }

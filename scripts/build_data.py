@@ -58,7 +58,7 @@ def add_amount(cube, key, revenue, quantity):
 def parse_sheet(zf, strings):
     metadata = {
         "sourceFile": WORKBOOK.name,
-        "generatedAt": datetime.now().replace(microsecond=0).isoformat(),
+        "sourceModifiedAt": datetime.fromtimestamp(WORKBOOK.stat().st_mtime).replace(microsecond=0).isoformat(),
         "totalRecords": 0,
         "totalRevenue": 0.0,
         "totalQuantity": 0,

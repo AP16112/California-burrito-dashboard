@@ -26,8 +26,12 @@ const elements = {
   records: document.getElementById("recordsKpi"),
   quantity: document.getElementById("quantityKpi"),
   aov: document.getElementById("aovKpi"),
+  exportButton: document.getElementById("exportButton"),
+  insights: document.getElementById("insightsList"),
   topItems: document.getElementById("topItemsBody")
 };
+
+let currentView = { orders: [], lines: [], items: [], filters: null };
 
 async function boot() {
   try {
@@ -47,6 +51,10 @@ async function boot() {
 }
 
 function setupFilters() {
+  elements.dateFrom.min = state.metadata.dateMin;
+  elements.dateFrom.max = state.metadata.dateMax;
+  elements.dateTo.min = state.metadata.dateMin;
+  elements.dateTo.max = state.metadata.dateMax;
   elements.dateFrom.value = state.metadata.dateMin;
   elements.dateTo.value = state.metadata.dateMax;
   populateSelect(elements.outlet, state.dimensions.outlets, "All outlets");
@@ -56,6 +64,7 @@ function setupFilters() {
 
   [elements.dateFrom, elements.dateTo, elements.outlet, elements.group, elements.orderType, elements.settlement]
     .forEach((control) => control.addEventListener("change", render));
+  elements.exportButton.addEventListener("click", exportCurrentView);
 }
 
 function populateSelect(select, values, allLabel) {
@@ -65,11 +74,14 @@ function populateSelect(select, values, allLabel) {
 }
 
 function getFilters() {
+  const from = elements.dateFrom.value || state.metadata.dateMin;
+  const to = elements.dateTo.value || state.metadata.dateMax;
+
   return {
-    from: elements.dateFrom.value || state.metadata.dateMin,
-    to: elements.dateTo.value || state.metadata.dateMax,
-    fromIndex: state.dateIndex[elements.dateFrom.value || state.metadata.dateMin],
-    toIndex: state.dateIndex[elements.dateTo.value || state.metadata.dateMax],
+    from,
+    to,
+    fromIndex: resolveDateIndex(from, "from"),
+    toIndex: resolveDateIndex(to, "to"),
     outlet: elements.outlet.value,
     outletIndex: elements.outlet.value ? state.valueIndex.outlets[elements.outlet.value] : -1,
     group: elements.group.value,
@@ -83,6 +95,25 @@ function getFilters() {
 
 function dateMatches(dateIndex, filters) {
   return dateIndex >= filters.fromIndex && dateIndex <= filters.toIndex;
+}
+
+function resolveDateIndex(value, edge) {
+  if (state.dateIndex[value] !== undefined) {
+    return state.dateIndex[value];
+  }
+
+  const dates = state.dimensions.dates;
+  if (edge === "from") {
+    const index = dates.findIndex((date) => date >= value);
+    return index < 0 ? dates.length - 1 : index;
+  }
+
+  for (let index = dates.length - 1; index >= 0; index -= 1) {
+    if (dates[index] <= value) {
+      return index;
+    }
+  }
+  return 0;
 }
 
 function orderMatches(order, filters) {
@@ -113,6 +144,7 @@ function render() {
   const orders = state.orders.filter((order) => orderMatches(order, filters));
   const lines = state.lineCube.filter((row) => lineMatches(row, filters));
   const items = state.itemCube.filter((row) => itemMatches(row, filters));
+  currentView = { orders, lines, items, filters };
 
   const revenue = sum(orders, O.revenue);
   const records = sum(orders, O.records);
@@ -128,6 +160,7 @@ function render() {
   renderTrend(orders);
   renderCategory(lines);
   renderOrderType(orders);
+  renderInsights(orders, lines, items);
   renderTopItems(items);
 }
 
@@ -216,6 +249,89 @@ function renderOrderType(orders) {
   });
 }
 
+function renderInsights(orders, lines, items) {
+  const revenue = sum(orders, O.revenue);
+  const aov = orders.length ? revenue / orders.length : 0;
+  const topCategory = topEntry(groupRows(lines, L.group, L.revenue), state.dimensions.groups);
+  const topOutlet = topEntry(groupRows(orders, O.outlet, O.revenue), state.dimensions.outlets);
+  const topItem = topItemEntry(items);
+  const deliveryMix = percentForKey(groupRows(orders, O.orderType, O.revenue), "Delivery", state.dimensions.orderTypes, revenue);
+
+  const cards = [
+    {
+      label: "Strongest category",
+      value: topCategory ? topCategory.label : "No data",
+      detail: topCategory ? `${money.format(topCategory.value)} in revenue` : "Change filters to widen the view"
+    },
+    {
+      label: "Best outlet",
+      value: topOutlet ? topOutlet.label : "No data",
+      detail: topOutlet ? `${money.format(topOutlet.value)} in revenue` : "No outlet matches this filter"
+    },
+    {
+      label: "Top item",
+      value: topItem ? topItem.item : "No data",
+      detail: topItem ? `${money.format(topItem.revenue)} and ${integer.format(topItem.quantity)} sold` : "No item matches this filter"
+    },
+    {
+      label: "Delivery mix",
+      value: `${deliveryMix}%`,
+      detail: "Share of filtered revenue from delivery orders"
+    },
+    {
+      label: "Average order",
+      value: money.format(aov),
+      detail: `${integer.format(orders.length)} filtered orders`
+    },
+    {
+      label: "Records analyzed",
+      value: integer.format(sum(orders, O.records)),
+      detail: "Filtered line-item records behind the KPIs"
+    }
+  ];
+
+  elements.insights.innerHTML = cards.map((card) => `
+    <article>
+      <span>${escapeHtml(card.label)}</span>
+      <strong>${escapeHtml(card.value)}</strong>
+      <p>${escapeHtml(card.detail)}</p>
+    </article>
+  `).join("");
+}
+
+function topEntry(grouped, labels) {
+  const [key, value] = Object.entries(grouped).sort((a, b) => b[1] - a[1])[0] || [];
+  return key === undefined ? null : { label: labels[key], value };
+}
+
+function topItemEntry(items) {
+  const grouped = items.reduce((map, row) => {
+    const key = `${row[I.item]}|${row[I.group]}`;
+    if (!map[key]) {
+      map[key] = {
+        item: state.dimensions.items[row[I.item]],
+        group: state.dimensions.groups[row[I.group]],
+        revenue: 0,
+        quantity: 0
+      };
+    }
+    map[key].revenue += Number(row[I.revenue] || 0);
+    map[key].quantity += Number(row[I.quantity] || 0);
+    return map;
+  }, {});
+
+  return Object.values(grouped).sort((a, b) => b.revenue - a.revenue)[0] || null;
+}
+
+function percentForKey(grouped, label, labels, total) {
+  const index = labels.indexOf(label);
+  if (index < 0 || !total) {
+    return 0;
+  }
+
+  return Math.round(((grouped[index] || 0) / total) * 100);
+}
+
 function renderTopItems(items) {
   const grouped = items.reduce((map, row) => {
     const key = `${row[I.item]}|${row[I.group]}`;
@@ -244,6 +360,47 @@ function renderTopItems(items) {
       </tr>
     `)
     .join("");
+}
+
+function exportCurrentView() {
+  const rows = currentView.items.reduce((map, row) => {
+    const key = `${row[I.item]}|${row[I.group]}`;
+    if (!map[key]) {
+      map[key] = {
+        item: state.dimensions.items[row[I.item]],
+        category: state.dimensions.groups[row[I.group]],
+        revenue: 0,
+        quantity: 0,
+        records: 0
+      };
+    }
+    map[key].revenue += Number(row[I.revenue] || 0);
+    map[key].quantity += Number(row[I.quantity] || 0);
+    map[key].records += Number(row[I.records] || 0);
+    return map;
+  }, {});
+
+  const csvRows = [
+    ["Item", "Category", "Revenue", "Quantity", "Records"],
+    ...Object.values(rows)
+      .sort((a, b) => b.revenue - a.revenue)
+      .map((row) => [row.item, row.category, row.revenue.toFixed(2), row.quantity, row.records])
+  ];
+  const csv = csvRows.map((row) => row.map(csvCell).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `dashboard-export-${currentView.filters.from}-to-${currentView.filters.to}.csv`;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function csvCell(value) {
+  const text = String(value ?? "");
+  return /[",\n]/.test(text) ? `"${text.replace(/"/g, "\"\"")}"` : text;
 }
 
 function chartOptions(showMoneyTooltip) {

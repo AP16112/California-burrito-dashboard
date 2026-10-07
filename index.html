@@ -41,6 +41,9 @@
           Settlement
           <select id="settlementFilter"></select>
         </label>
+        <div class="filter-actions">
+          <button id="exportButton" type="button">Export CSV</button>
+        </div>
       </section>
 
       <section class="kpis" aria-label="Key performance indicators">
@@ -53,7 +56,7 @@
           <strong id="ordersKpi">-</strong>
         </article>
         <article>
-          <span>Line records</span>
+          <span>Total records</span>
           <strong id="recordsKpi">-</strong>
         </article>
         <article>
@@ -67,6 +70,14 @@
       </section>
 
       <section class="grid">
+        <article class="panel wide insight-panel">
+          <div class="panel-head">
+            <h2>Generated Insights</h2>
+            <p>Highlights from the current filtered view</p>
+          </div>
+          <div class="insights" id="insightsList"></div>
+        </article>
+
         <article class="panel wide">
           <div class="panel-head">
             <h2>Revenue Trend</h2>

@@ -26,10 +26,12 @@ The frontend is dependency-light: static HTML/CSS/JavaScript with Chart.js loade
 
 ## Dashboard Features
 
-- KPIs: total revenue, orders, line records, quantity sold, and average order value.
+- KPIs: total revenue, orders, total records, quantity sold, and average order value.
 - Filters: date range, outlet, category, order type, and settlement.
 - Visualizations: daily revenue line chart, category revenue bar chart, and order-type doughnut chart.
+- Generated insights for strongest category, best outlet, top item, delivery mix, average order, and records analyzed.
 - Top items table with revenue and quantity.
+- CSV export for the current filtered item-level view.
 - Responsive layout for desktop and mobile.
 
 ## Trade-Offs
@@ -46,6 +48,15 @@ The frontend is dependency-light: static HTML/CSS/JavaScript with Chart.js loade
 - I avoided counting raw rows as orders. The dashboard uses unique `BillNo` rows for order KPIs so multi-item orders are not double-counted.
 - I dictionary-encoded the generated JSON to reduce repeated strings and shrink the dashboard payload.
 - I kept the frontend dependency-light so the project can be hosted easily on common static deployment platforms.
+
+## Bonus Features
+
+- Advanced filtering across date range, outlet, category, order type, and settlement.
+- Filtered CSV export for additional offline analysis.
+- Generated insight cards that summarize the current dashboard view.
+- Responsive desktop and mobile layout.
+- Performance optimizations through precomputed aggregates, dictionary-encoded JSON, and static-host cache headers for the analytics payload.
+- Deployment configuration files for Vercel and Netlify cache behavior.
 
 ## Deployment
 
