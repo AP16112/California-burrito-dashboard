@@ -4,6 +4,7 @@
   "private": true,
   "description": "Business analytics dashboard for the technical assessment dataset.",
   "scripts": {
+    "build": "node scripts/build_static.js",
     "build:data": "python scripts/build_data.py",
     "dev": "node server.js"
   },

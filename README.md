@@ -65,11 +65,11 @@ The frontend is dependency-light: static HTML/CSS/JavaScript with Chart.js loade
 3. Import the repository in Vercel.
 4. Use these Vercel settings:
    - Framework Preset: `Other`
-   - Build Command: leave empty
-   - Output Directory: `.`
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
    - Install Command: leave default or empty
 
-Do not run `npm run build:data` on Vercel unless you also upload `data.xlsx`. The raw workbook is ignored from Git, and the committed `public/data/analytics.json` is what the deployed static dashboard reads.
+Do not run `npm run build:data` on Vercel unless you also upload `data.xlsx`. The raw workbook is ignored from Git, and the committed `public/data/analytics.json` is what the deployed static dashboard reads. `npm run build` only copies the static dashboard into `dist` for Vercel.
 
 Deployed URL: _add after deployment_
 GitHub repository: _add after publishing_
