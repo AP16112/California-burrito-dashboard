@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>California Burrito Analytics Dashboard</title>
+    <link rel="stylesheet" href="src/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js" defer></script>
+    <script src="src/app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Software Developer Intern Assessment</p>
+        <h1>Business Analytics Dashboard</h1>
+      </div>
+      <div class="status" id="loadStatus">Loading dataset</div>
+    </header>
+
+    <main>
+      <section class="filters" aria-label="Dashboard filters">
+        <label>
+          From
+          <input id="dateFrom" type="date">
+        </label>
+        <label>
+          To
+          <input id="dateTo" type="date">
+        </label>
+        <label>
+          Outlet
+          <select id="outletFilter"></select>
+        </label>
+        <label>
+          Category
+          <select id="groupFilter"></select>
+        </label>
+        <label>
+          Order type
+          <select id="orderTypeFilter"></select>
+        </label>
+        <label>
+          Settlement
+          <select id="settlementFilter"></select>
+        </label>
+      </section>
+
+      <section class="kpis" aria-label="Key performance indicators">
+        <article>
+          <span>Total revenue</span>
+          <strong id="revenueKpi">-</strong>
+        </article>
+        <article>
+          <span>Orders</span>
+          <strong id="ordersKpi">-</strong>
+        </article>
+        <article>
+          <span>Line records</span>
+          <strong id="recordsKpi">-</strong>
+        </article>
+        <article>
+          <span>Items sold</span>
+          <strong id="quantityKpi">-</strong>
+        </article>
+        <article>
+          <span>Avg order value</span>
+          <strong id="aovKpi">-</strong>
+        </article>
+      </section>
+
+      <section class="grid">
+        <article class="panel wide">
+          <div class="panel-head">
+            <h2>Revenue Trend</h2>
+            <p>Daily revenue for the selected filters</p>
+          </div>
+          <canvas id="trendChart"></canvas>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Revenue by Category</h2>
+            <p>Menu group contribution</p>
+          </div>
+          <canvas id="categoryChart"></canvas>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Order Mix</h2>
+            <p>Dine-in, takeaway, and delivery split</p>
+          </div>
+          <canvas id="orderTypeChart"></canvas>
+        </article>
+
+        <article class="panel wide">
+          <div class="panel-head">
+            <h2>Top Items</h2>
+            <p>Highest revenue menu items</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Category</th>
+                  <th>Revenue</th>
+                  <th>Quantity</th>
+                </tr>
+              </thead>
+              <tbody id="topItemsBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

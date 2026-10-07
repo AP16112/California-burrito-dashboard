@@ -1,0 +1,17 @@
+{
+  "name": "california-burrito-analytics-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Business analytics dashboard for the technical assessment dataset.",
+  "scripts": {
+    "build:data": "python scripts/build_data.py",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "analytics",
+    "dashboard",
+    "assessment"
+  ],
+  "author": "",
+  "license": "MIT"
+}

@@ -1,0 +1,49 @@
+# Business Analytics Dashboard
+
+Web analytics dashboard built for the Software Developer Intern technical assessment. It ingests the supplied `data.xlsx`, precomputes compact analytics JSON, and serves a responsive dashboard with KPIs, filters, charts, and top item analysis.
+
+## Run Locally
+
+```powershell
+npm run build:data
+npm run dev
+```
+
+Open `http://localhost:4173`.
+
+## Architecture
+
+The raw Excel workbook is about 300K line-item records. Loading that directly in the browser would slow the first page load and make every filter scan unnecessarily expensive. Instead, `scripts/build-data.ps1` streams `data.xlsx` as OpenXML, computes line revenue as `Price * Quantity`, converts Excel date serials to ISO dates, and writes `public/data/analytics.json`.
+
+The generated JSON dictionary-encodes repeated values such as dates, outlets, groups, and item names so the browser receives compact arrays instead of repeated strings. It keeps:
+
+- `orders`: one row per `BillNo`, used for accurate order-level KPIs and revenue trend filtering.
+- `lineCube`: aggregated line metrics by date, outlet, brand, category, order type, and settlement.
+- `itemCube`: aggregated item metrics for the top-items table.
+- `dimensions`: filter values discovered from the dataset.
+
+The frontend is dependency-light: static HTML/CSS/JavaScript with Chart.js loaded from CDN. This makes deployment straightforward on Vercel, Netlify, Render Static Sites, Azure Static Web Apps, or GitHub Pages.
+
+## Dashboard Features
+
+- KPIs: total revenue, orders, line records, quantity sold, and average order value.
+- Filters: date range, outlet, category, order type, and settlement.
+- Visualizations: daily revenue line chart, category revenue bar chart, and order-type doughnut chart.
+- Top items table with revenue and quantity.
+- Responsive layout for desktop and mobile.
+
+## Trade-Offs
+
+- The app uses precomputed analytics instead of a database because the assessment dataset is static and the dashboard is read-only. This keeps hosting simple and page interactions fast.
+- Order counts are calculated from one row per `BillNo`, while category and item breakdowns use line-item aggregates. This avoids double-counting orders in the main KPIs.
+- If the dataset needed frequent updates, user accounts, or ad hoc querying over many dimensions, I would move the ETL output into SQLite/PostgreSQL and expose a small API layer.
+
+## Deployment
+
+1. Run `npm run build:data`.
+2. Push the project to a public GitHub repository.
+3. Deploy the repository to Vercel, Netlify, Render, Railway, or Azure Static Web Apps.
+4. Use `npm run build:data` as the build command if the platform supports PowerShell. Otherwise, commit `public/data/analytics.json` after generating it locally and deploy as a static site.
+
+Deployed URL: _add after deployment_
+GitHub repository: _add after publishing_
